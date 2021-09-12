@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
@@ -36,6 +33,7 @@ public class TransactionController {
      * @param amount        Amount to be transferred
      * @return ResponseEntity
      */
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping(path = "/transfer/{fromAccountId}/{toAccountId}/{amount}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> transfer(@PathVariable String fromAccountId, @PathVariable String toAccountId,
@@ -44,10 +42,9 @@ public class TransactionController {
 
         try {
             this.txnService.transfer(fromAccountId, toAccountId, amount);
-        } catch (Exception exception) {
-            return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (InterruptedException exception) {
+            return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return null;
     }
 }
