@@ -1,6 +1,7 @@
 package com.db.awmd.challenge.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
@@ -27,7 +28,7 @@ public class Account {
     @Min(value = 0, message = "Initial balance must be positive.")
     private BigDecimal balance;
 
-    @Getter
+    @JsonIgnore
     private final transient Lock lock = new ReentrantLock();
 
     public Account(String accountId) {
@@ -46,7 +47,7 @@ public class Account {
         try {
             if (lock.tryLock(100, TimeUnit.MILLISECONDS)) {
                 try {
-                    if (this.balance.compareTo(amount) > 0) {
+                    if (this.balance.compareTo(amount) >= 0) {
                         this.balance = this.balance.subtract(amount);
                         return true;
                     }

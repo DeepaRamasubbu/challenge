@@ -25,11 +25,11 @@ public class TransactionService {
     @Getter
     private final AccountsRepository accountsInMemory;
 
-    private NotificationService notificationService;
+    private EmailNotificationService notificationService;
 
 
     @Autowired
-    public TransactionService(AccountsRepository accountsRepository, NotificationService notificationService) {
+    public TransactionService(AccountsRepository accountsRepository, EmailNotificationService notificationService) {
         this.accountsInMemory = accountsRepository;
         this.notificationService = notificationService;
     }
@@ -52,6 +52,11 @@ public class TransactionService {
         // 2. transfer the amount
         runTransfer(debit, credit, amount);
         // 3. Send notification
+        notificationService.notifyAboutTransfer(debit,"Amount " + amount + " has been transferred to account id " +
+                credit.getAccountId());
+        notificationService.notifyAboutTransfer(credit,"Amount " + amount + " has been transferred from account id " +
+                debit.getAccountId());
+
 
     }
 
@@ -75,7 +80,7 @@ public class TransactionService {
                             credit.credit(amount);
                         } else {
                             log.info("Insufficient funds");
-                            throw new InsufficientFundsException();
+                            throw new InsufficientFundsException("Insufficient funds");
                         }
                     }
                 } finally {
