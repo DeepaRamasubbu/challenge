@@ -82,5 +82,14 @@ public class TransactionControllerTest {
 
     }
 
+    @Test
+    public void transferWithZeroAmount() throws Exception {
+        this.mockMvc.perform(post("/v1/transaction/transfer/{fromAccountId}/{toAccountId}/{amount}", "12", "13", 0).
+                        contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ValidationException))
+                .andExpect(result -> assertEquals("Amount should be greater than 0", result.getResolvedException().getMessage()));
+
+    }
+
 
 }
